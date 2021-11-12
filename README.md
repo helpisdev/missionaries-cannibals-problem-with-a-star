@@ -44,8 +44,8 @@ it, else null.
 
 ### Evaluation function
 A*'s evaluation is: f(n) = g(n) + W * h(n), where 
-W = 1 (weight) and g is the function that returns the cost
-from the root of the tree till node n, while h is the
+*W* = 1 (weight), *g(n)* is the function that returns the cost
+from the root of the tree till node n, and *h(n)* is the
 heuristic function estimating the cost till the solution.
 The heuristic is used by relaxing the problem's constraints,
 meaning dropping the condition that cannibals must always be
