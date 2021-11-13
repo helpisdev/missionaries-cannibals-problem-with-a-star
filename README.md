@@ -55,7 +55,7 @@ is a calculates a solution for a super-graph of the original
 problem, it is an admissible heuristic. The function created
 is as follows: 
 
-**2 * (FLOOR((N / 1) / (C - 1))) - 1 + 2 * ((N - 1 - 
+**2 * (FLOOR((N - 1) / (C - 1))) - 1 + 2 * ((N - 1 - 
 (FLOOR(N / (C - 1))) * (C - 1)) != 0 ? 1 : 0) + D % 2**
 
 Where:
