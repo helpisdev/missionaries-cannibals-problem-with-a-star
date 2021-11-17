@@ -80,8 +80,8 @@ public class AStarImpl {
 
         while (!finished) {
             try {
-                final long start = System.currentTimeMillis();
                 int[] input = this.getInput();
+                final long start = System.currentTimeMillis();
                 NodeImpl root = new NodeImpl(null);
                 AStarTreeImpl aStarTree = new AStarTreeImpl(root, input[0], input[1], this.maxDepth);
                 aStarTree.getRoot().setBelongingTree(aStarTree);
