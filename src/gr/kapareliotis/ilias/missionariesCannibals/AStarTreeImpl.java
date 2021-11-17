@@ -3,6 +3,7 @@ package gr.kapareliotis.ilias.missionariesCannibals;
 import gr.kapareliotis.ilias.aStarInterface.Node;
 import gr.kapareliotis.ilias.aStarInterface.Tree;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class AStarTreeImpl extends Tree {
@@ -10,20 +11,34 @@ public class AStarTreeImpl extends Tree {
     private final int boatCapacity;
     private final int maxDepth;
     private final HashSet<NodeImpl> reached = new HashSet<>();
+    private final ArrayList<int[]> possiblePairs = new ArrayList<>();
+    public int validNodes = 0;
+    public int invalidNodes = 0;
 
     public AStarTreeImpl(Node root, int numberOfPeople, int boatCapacity, int maxDepth) {
         super(root);
         this.numberOfPeople = numberOfPeople;
         this.boatCapacity = boatCapacity;
         this.maxDepth = maxDepth;
+        this.createPairs();
+    }
+
+    private void createPairs() {
+        for (int cannibals = 0; cannibals <= this.boatCapacity; ++cannibals) {
+            for (int missionaries = 0; missionaries <= this.boatCapacity; ++missionaries) {
+                if ((missionaries != 0 || cannibals != 0) && cannibals <= missionaries) {
+                    this.possiblePairs.add(new int[]{missionaries, cannibals});
+                }
+            }
+        }
+    }
+
+    public ArrayList<int[]> getPossiblePairs() {
+        return this.possiblePairs;
     }
 
     public int getNumberOfPeople() {
         return this.numberOfPeople;
-    }
-
-    public int getBoatCapacity() {
-        return this.boatCapacity;
     }
 
     public RiverBank getBoatSide(Node node) {

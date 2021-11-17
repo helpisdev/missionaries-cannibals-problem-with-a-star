@@ -18,126 +18,61 @@ public class NodeImpl extends Node {
         super(parent);
     }
 
-    private ArrayList<int[]> movePeopleToTheOtherBank() {
-        int mOnCurBank;
-        int cOnCurBank;
-        final int boatCapacity = this.getBelongingTree().getBoatCapacity();
+    private NodeImpl(Node parent, int missionaries, int cannibals, int mOnBoat, int cOnBoat, int mOnBank2, int cOnBank2) {
+        super(parent);
+        this.missionaries = missionaries;
+        this.cannibals = cannibals;
+        this.mOnBoat = mOnBoat;
+        this.cOnBoat = cOnBoat;
+        this.mOnBank2 = mOnBank2;
+        this.cOnBank2 = cOnBank2;
+        this.setBelongingTree(parent.getBelongingTree());
+    }
 
-        if (this.getBelongingTree().getBoatSide(this) == RiverBank.LEFT) {
-            mOnCurBank = this.missionaries;
-            cOnCurBank = this.cannibals;
-        } else {
-            mOnCurBank = this.mOnBank2;
-            cOnCurBank = this.cOnBank2;
-        }
+    private ArrayList<int[]> movePeople() {
+        ArrayList<int[]> validCombos = new ArrayList<>();
+        ArrayList<int[]> possiblePairs = this.getBelongingTree().getPossiblePairs();
 
-        mOnCurBank += this.mOnBoat;
-        cOnCurBank += this.cOnBoat;
+        final boolean isBoatLeft = this.getBelongingTree().getBoatSide(this) == RiverBank.LEFT;
+        final int totalMissionaries = this.mOnBoat + (isBoatLeft ? this.missionaries : this.mOnBank2);
+        final int totalCannibals = this.cOnBoat + (isBoatLeft ? this.cannibals : this.cOnBank2);
 
-        final ArrayList<int[]> combinations = new ArrayList<>();
-        final int mLimit = Math.min(boatCapacity, mOnCurBank);
-        final int cLimit = Math.min(boatCapacity, cOnCurBank);
-        final int peopleLimit = Math.min(boatCapacity, mOnCurBank + cOnCurBank);
-
-        for (int mOnBoard = 0; mOnBoard <= mLimit; ++mOnBoard) {
-            int temp = Math.max(cLimit - mOnBoard, 0);
-            for (int cOnBoard = 0; cOnBoard <= cLimit; ++cOnBoard) {
-                final boolean isLegal = (mOnBoard + cOnBoard != 0)
-                        && this.isComboLegal(cOnBoard, mOnBoard)
-                        && this.isComboLegal(mOnBoard, mLimit)
-                        && this.isComboLegal(cOnBoard, cLimit)
-                        && this.isComboLegal(mOnCurBank - mOnBoard, cOnCurBank - cOnBoard)
-                        && this.isComboLegal(cOnBoard + mOnBoard, peopleLimit);
-
-                if (isLegal) {
-                    combinations.add(new int[]{mOnBoard, cOnBoard});
-                }
+        for (int[] pair : possiblePairs) {
+            final int newMissionaries = totalMissionaries - pair[0];
+            final int newCannibals = totalCannibals - pair[1];
+            if (newCannibals <= newMissionaries && newCannibals >= 0) {
+                validCombos.add(new int[]{newMissionaries, newCannibals, pair[0], pair[1]});
+            } else {
+                this.getBelongingTree().invalidNodes++;
             }
         }
 
-        return combinations;
-    }
-
-    private ArrayList<int[]> createBankBoatCombos(int[] peopleCombo) {
-        int mOnOtherBank;
-        int cOnOtherBank;
-        final int boatCapacity = this.getBelongingTree().getBoatCapacity();
-
-        if (this.getBelongingTree().getBoatSide(this) == RiverBank.RIGHT) {
-            mOnOtherBank = this.missionaries;
-            cOnOtherBank = this.cannibals;
-        } else {
-            mOnOtherBank = this.mOnBank2;
-            cOnOtherBank = this.cOnBank2;
-        }
-
-        mOnOtherBank += peopleCombo[0];
-        cOnOtherBank += peopleCombo[1];
-
-        final ArrayList<int[]> combinations = new ArrayList<>();
-        final int mLimit = Math.min(boatCapacity, mOnOtherBank);
-        final int cLimit = Math.min(boatCapacity, cOnOtherBank);
-        final int peopleLimit = Math.min(boatCapacity, mOnOtherBank + cOnOtherBank);
-
-        for (int mOnBoard = 0; mOnBoard <= mLimit; ++mOnBoard) {
-            for (int cOnBoard = 0; cOnBoard <= cLimit; ++cOnBoard
-            ) {
-                final boolean isLegal = this.isComboLegal(cOnBoard, mOnBoard)
-                        && this.isComboLegal(mOnBoard, mLimit)
-                        && this.isComboLegal(cOnBoard, cLimit)
-                        && this.isComboLegal(mOnOtherBank - mOnBoard, cOnOtherBank - cOnBoard)
-                        && this.isComboLegal(cOnBoard + mOnBoard, peopleLimit);
-
-                if (isLegal) {
-                    combinations.add(new int[]{mOnOtherBank - mOnBoard, cOnOtherBank - cOnBoard, mOnBoard, cOnBoard});
-                }
-            }
-        }
-
-        return combinations;
-    }
-
-    private boolean isComboLegal(int people, int limit) {
-        if (people < 0 || limit < 0) {
-            return false;
-        }
-        return people <= limit;
+        return validCombos;
     }
 
     @Override
     public void createChildren() {
-        final ArrayList<int[]> moveCombinations = this.movePeopleToTheOtherBank();
-        for (int[] movingPeople : moveCombinations) {
-            final ArrayList<int[]> validCombinations = this.createBankBoatCombos(movingPeople);
-            for (int[] validCombo : validCombinations) {
-                final NodeImpl child = new NodeImpl(this);
-                final int mOnLeftBank;
-                final int cOnLeftBank;
-                final int mOnRightBank;
-                final int cOnRightBank;
-                if (this.getBelongingTree().getBoatSide(this) == RiverBank.LEFT) {
-                    mOnRightBank = validCombo[0];
-                    cOnRightBank = validCombo[1];
-                    mOnLeftBank = this.getBelongingTree().getNumberOfPeople() / 2 - mOnRightBank - validCombo[2];
-                    cOnLeftBank = this.getBelongingTree().getNumberOfPeople() / 2 - cOnRightBank - validCombo[3];
-                } else {
-                    mOnLeftBank = validCombo[0];
-                    cOnLeftBank = validCombo[1];
-                    mOnRightBank = this.getBelongingTree().getNumberOfPeople() / 2 - mOnLeftBank - validCombo[2];
-                    cOnRightBank = this.getBelongingTree().getNumberOfPeople() / 2 - cOnLeftBank - validCombo[3];
-                }
+        ArrayList<int[]> validCombos = this.movePeople();
+        final boolean isBoatLeft = this.getBelongingTree().getBoatSide(this) == RiverBank.LEFT;
 
-                child.setMissionaries(mOnLeftBank);
-                child.setCannibals(cOnLeftBank);
-                child.setMisOnBank2(mOnRightBank);
-                child.setCanOnBank2(cOnRightBank);
-                child.setMisOnBoat(validCombo[2]);
-                child.setCanOnBoat(validCombo[3]);
-                child.setBelongingTree(this.getBelongingTree());
+        for (int[] people : validCombos) {
+            final int missionariesLeft = isBoatLeft ? people[0] : this.missionaries;
+            final int missionariesRight = isBoatLeft ? this.mOnBank2 : people[0];
+            final int cannibalsLeft = isBoatLeft ? people[1] : this.cannibals;
+            final int cannibalsRight = isBoatLeft ? this.cOnBank2 : people[1];
 
-                if (!this.getBelongingTree().getReached().contains(child)) {
-                    this.getChildren().add(child);
-                }
+            NodeImpl child = new NodeImpl(
+                    this,
+                    missionariesLeft,
+                    cannibalsLeft,
+                    people[2],
+                    people[3],
+                    missionariesRight,
+                    cannibalsRight
+            );
+            if (!this.getBelongingTree().getReached().contains(child)) {
+                super.getChildren().add(child);
+                this.getBelongingTree().validNodes++;
             }
         }
     }
@@ -206,12 +141,15 @@ public class NodeImpl extends Node {
 
     @Override
     public String toString() {
+        final boolean isBoatLeft = this.getBelongingTree().getBoatSide(this) == RiverBank.LEFT;
+        final String boatRepresentation =
+                isBoatLeft ? "<" + this.mOnBoat + ", " + this.cOnBoat + ">______" :
+                        "______<" + this.mOnBoat + ", " + this.cOnBoat + ">";
         return String.format(
-                "(%d, %d, %d, %d, %d, %d, Side: %d)",
+                "(%d, %d, %s, %d, %d, Side: %d)",
                 this.missionaries,
                 this.cannibals,
-                this.mOnBoat,
-                this.cOnBoat,
+                boatRepresentation,
                 this.mOnBank2,
                 this.cOnBank2,
                 this.getBelongingTree().getBoatSide(this).getBankValue()

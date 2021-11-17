@@ -80,6 +80,7 @@ public class AStarImpl {
 
         while (!finished) {
             try {
+                final long start = System.currentTimeMillis();
                 int[] input = this.getInput();
                 NodeImpl root = new NodeImpl(null);
                 AStarTreeImpl aStarTree = new AStarTreeImpl(root, input[0], input[1], this.maxDepth);
@@ -89,6 +90,16 @@ public class AStarImpl {
 
                 solution = this.searchTree(aStarTree);
                 System.out.println(this.displaySolution(solution));
+                java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###");
+                System.out.println("Valid nodes: " + formatter.format(aStarTree.validNodes));
+                System.out.println("Invalid nodes: " + formatter.format(aStarTree.invalidNodes));
+                System.out.println("Total search graph nodes: "
+                        + formatter.format(aStarTree.validNodes + aStarTree.invalidNodes));
+                System.out.println("Number of steps: " + formatter.format(solution.getDepth()));
+                final long end = System.currentTimeMillis();
+                final long elapsedTime = end - start;
+                formatter = new java.text.DecimalFormat("#,###.###");
+                System.out.println("Elapsed time (in seconds): " + formatter.format((double)elapsedTime / 1000));
 
                 finished = true;
             } catch (Exception e) {
@@ -98,7 +109,7 @@ public class AStarImpl {
     }
 
     private String displaySolution(NodeImpl solution) {
-        String pointer = "\n             |             \n             |             \n             v             \n";
+        String pointer = "\n               |               \n               |               \n               v               \n";
 
         if (solution != null) {
             if (solution.getParent() != null) {
