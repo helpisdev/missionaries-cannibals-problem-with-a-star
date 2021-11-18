@@ -2,15 +2,15 @@ package gr.kapareliotis.ilias.missionariesCannibals;
 
 public class AStarImpl {
     private int maxDepth;
+    private int boatCapacity;
+    private int numberOfPeople;
 
-    private int[] getInput() {
+    private void getInput() {
         java.util.Scanner scanner = new java.util.Scanner(System.in);
         boolean isInputCorrect;
         int numberOfPeople;
         int boatCapacity;
         int maximumDepth;
-
-        int[] input = new int[2];
 
         do {
             try {
@@ -23,7 +23,7 @@ public class AStarImpl {
                     continue;
                 }
 
-                input[0] = numberOfPeople;
+                this.numberOfPeople = numberOfPeople;
 
                 System.out.print("Enter the boat capacity: ");
                 boatCapacity = scanner.nextInt();
@@ -32,7 +32,7 @@ public class AStarImpl {
                     continue;
                 }
 
-                input[1] = boatCapacity;
+                this.boatCapacity = boatCapacity;
 
                 System.out.print("Enter the maximum river crossings: ");
                 maximumDepth = scanner.nextInt();
@@ -47,8 +47,6 @@ public class AStarImpl {
                 isInputCorrect = false;
             }
         } while (!isInputCorrect);
-
-        return input;
     }
 
     private NodeImpl searchTree(AStarTreeImpl aStarTree) {
@@ -80,26 +78,16 @@ public class AStarImpl {
 
         while (!finished) {
             try {
-                int[] input = this.getInput();
+                this.getInput();
                 final long start = System.currentTimeMillis();
                 NodeImpl root = new NodeImpl(null);
-                AStarTreeImpl aStarTree = new AStarTreeImpl(root, input[0], input[1], this.maxDepth);
+                AStarTreeImpl aStarTree = new AStarTreeImpl(root, this.numberOfPeople, this.boatCapacity, this.maxDepth);
                 aStarTree.getRoot().setBelongingTree(aStarTree);
-                ((NodeImpl) aStarTree.getRoot()).setMissionaries(input[0] / 2);
-                ((NodeImpl) aStarTree.getRoot()).setCannibals(input[0] / 2);
+                ((NodeImpl) aStarTree.getRoot()).setMissionaries(this.numberOfPeople / 2);
+                ((NodeImpl) aStarTree.getRoot()).setCannibals(this.numberOfPeople / 2);
 
                 solution = this.searchTree(aStarTree);
-                System.out.println(this.displaySolution(solution));
-                java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###");
-                System.out.println("Valid nodes: " + formatter.format(aStarTree.validNodes));
-                System.out.println("Invalid nodes: " + formatter.format(aStarTree.invalidNodes));
-                System.out.println("Total search graph nodes: "
-                        + formatter.format(aStarTree.validNodes + aStarTree.invalidNodes));
-                System.out.println("Number of steps: " + formatter.format(solution.getDepth()));
-                final long end = System.currentTimeMillis();
-                final long elapsedTime = end - start;
-                formatter = new java.text.DecimalFormat("#,###.###");
-                System.out.println("Elapsed time (in seconds): " + formatter.format((double)elapsedTime / 1000));
+                this.printInfo(solution, aStarTree, start);
 
                 finished = true;
             } catch (Exception e) {
@@ -108,12 +96,32 @@ public class AStarImpl {
         }
     }
 
-    private String displaySolution(NodeImpl solution) {
+    private void printInfo(NodeImpl solution, AStarTreeImpl aStarTree, long start) {
+        java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###");
+        System.out.println(this.produceSolutionDisplay(solution));
+        System.out.println("Number of moving people: " + formatter.format(this.numberOfPeople));
+        System.out.println("Boat capacity: " + formatter.format(this.boatCapacity));
+        System.out.println("Number of max steps: " + formatter.format(this.maxDepth));
+        System.out.println("Valid nodes: " + formatter.format(aStarTree.validNodes));
+        System.out.println("Invalid nodes: " + formatter.format(aStarTree.invalidNodes));
+        System.out.println("Total search graph nodes: "
+                + formatter.format(aStarTree.validNodes + aStarTree.invalidNodes));
+        if (solution != null) {
+            System.out.println("Heuristic result: " + aStarTree.calcHeuristicCost(aStarTree.getRoot()));
+            System.out.println("Number of steps: " + formatter.format(solution.getDepth()));
+        }
+        final long end = System.currentTimeMillis();
+        final long elapsedTime = end - start;
+        formatter = new java.text.DecimalFormat("#,###.###");
+        System.out.println("Elapsed time (in seconds): " + formatter.format((double)elapsedTime / 1000));
+    }
+
+    private String produceSolutionDisplay(NodeImpl solution) {
         String pointer = "\n               |               \n               |               \n               v               \n";
 
         if (solution != null) {
             if (solution.getParent() != null) {
-                return displaySolution((NodeImpl) solution.getParent()) + pointer + solution;
+                return produceSolutionDisplay((NodeImpl) solution.getParent()) + pointer + solution;
             }
             return solution.toString();
         }

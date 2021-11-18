@@ -3,15 +3,14 @@ package gr.kapareliotis.ilias.missionariesCannibals;
 import gr.kapareliotis.ilias.aStarInterface.Node;
 import gr.kapareliotis.ilias.aStarInterface.Tree;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 
 public class AStarTreeImpl extends Tree {
     private final int numberOfPeople;
     private final int boatCapacity;
     private final int maxDepth;
     private final HashSet<NodeImpl> reached = new HashSet<>();
-    private final ArrayList<int[]> possiblePairs = new ArrayList<>();
+    private final ArrayList<int[]> pairs = new ArrayList<>();
     public int validNodes = 0;
     public int invalidNodes = 0;
 
@@ -26,15 +25,24 @@ public class AStarTreeImpl extends Tree {
     private void createPairs() {
         for (int cannibals = 0; cannibals <= this.boatCapacity; ++cannibals) {
             for (int missionaries = 0; missionaries <= this.boatCapacity; ++missionaries) {
-                if ((missionaries != 0 || cannibals != 0) && cannibals <= missionaries) {
-                    this.possiblePairs.add(new int[]{missionaries, cannibals});
+                if ((!(missionaries == 0 && cannibals == 0))) {
+                    if (cannibals > missionaries) {
+                        continue;
+                    }
+                    if (cannibals + missionaries > this.boatCapacity) {
+                        break;
+                    }
+                    this.pairs.add(new int[]{missionaries, cannibals});
                 }
+            }
+            if (cannibals > 0) {
+                this.pairs.add(new int[]{0, cannibals});
             }
         }
     }
 
-    public ArrayList<int[]> getPossiblePairs() {
-        return this.possiblePairs;
+    public ArrayList<int[]> getPairs() {
+        return this.pairs;
     }
 
     public int getNumberOfPeople() {

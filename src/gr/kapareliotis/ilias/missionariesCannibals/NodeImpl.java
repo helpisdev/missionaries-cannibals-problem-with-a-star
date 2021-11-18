@@ -31,15 +31,15 @@ public class NodeImpl extends Node {
 
     private ArrayList<int[]> movePeople() {
         ArrayList<int[]> validCombos = new ArrayList<>();
-        ArrayList<int[]> possiblePairs = this.getBelongingTree().getPossiblePairs();
+        ArrayList<int[]> pairs = this.getBelongingTree().getPairs();
 
         final boolean isBoatLeft = this.getBelongingTree().getBoatSide(this) == RiverBank.LEFT;
         final int totalMissionaries = this.mOnBoat + (isBoatLeft ? this.missionaries : this.mOnBank2);
         final int totalCannibals = this.cOnBoat + (isBoatLeft ? this.cannibals : this.cOnBank2);
 
-        for (int[] pair : possiblePairs) {
-            final int newMissionaries = totalMissionaries - pair[0];
-            final int newCannibals = totalCannibals - pair[1];
+        for (int[] pair : pairs) {
+            int newMissionaries = totalMissionaries - pair[0];
+            int newCannibals = totalCannibals - pair[1];
             if (newCannibals <= newMissionaries && newCannibals >= 0) {
                 validCombos.add(new int[]{newMissionaries, newCannibals, pair[0], pair[1]});
             } else {
