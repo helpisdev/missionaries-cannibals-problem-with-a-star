@@ -43,7 +43,7 @@ public class NodeImpl extends Node {
             if (newCannibals <= newMissionaries && newCannibals >= 0) {
                 validCombos.add(new int[]{newMissionaries, newCannibals, pair[0], pair[1]});
             } else {
-                this.getBelongingTree().invalidNodes++;
+                this.getBelongingTree().increaseInvalidCombinations();
             }
         }
 
@@ -72,7 +72,7 @@ public class NodeImpl extends Node {
             );
             if (!this.getBelongingTree().getReached().contains(child)) {
                 super.getChildren().add(child);
-                this.getBelongingTree().validNodes++;
+                this.getBelongingTree().increaseValidNodes();
             }
         }
     }

@@ -18,7 +18,8 @@ public class AStarImpl {
 
                 System.out.print("Enter the number of missionaries: ");
                 missionaries = scanner.nextInt();
-                if (missionaries < 0) {
+                if (missionaries < 1) {
+                    System.out.println("There must be at least 1 missionary.");
                     isInputCorrect = false;
                     continue;
                 }
@@ -28,6 +29,7 @@ public class AStarImpl {
                 System.out.print("Enter the boat capacity: ");
                 boatCapacity = scanner.nextInt();
                 if (boatCapacity <= 1) {
+                    System.out.println("The boat must have a capacity of at lest 2 people.");
                     isInputCorrect = false;
                     continue;
                 }
@@ -37,6 +39,7 @@ public class AStarImpl {
                 System.out.print("Enter the maximum river crossings: ");
                 maximumDepth = scanner.nextInt();
                 if (maximumDepth < 1) {
+                    System.out.println("Solution depth must be at least 1.");
                     isInputCorrect = false;
                     continue;
                 }
@@ -99,17 +102,28 @@ public class AStarImpl {
     private void printInfo(NodeImpl solution, AStarTreeImpl aStarTree, long start) {
         java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###");
         System.out.println(this.produceSolutionDisplay(solution));
-        System.out.println("Number of moving people: " + formatter.format(this.numberOfPeople));
-        System.out.println("Boat capacity: " + formatter.format(this.boatCapacity));
-        System.out.println("Number of max steps: " + formatter.format(this.maxDepth));
-        System.out.println("Valid nodes: " + formatter.format(aStarTree.validNodes));
-        System.out.println("Invalid nodes: " + formatter.format(aStarTree.invalidNodes));
-        System.out.println("Total search graph nodes: "
-                + formatter.format(aStarTree.validNodes + aStarTree.invalidNodes));
+
+        final String results = String.format(
+                "%s%s%n%s%s%n%s%s%n%s%s%n%s%s%n",
+                "Number of moving people: ",
+                formatter.format(this.numberOfPeople),
+                "Boat capacity: ",
+                formatter.format(this.boatCapacity),
+                "Number of max steps: ",
+                formatter.format(this.maxDepth),
+                "Valid nodes: ",
+                formatter.format(aStarTree.getValidNodes()),
+                "Combinations examined: ",
+                formatter.format(aStarTree.getValidNodes() + aStarTree.getInvalidCombinations())
+        );
+
+        System.out.println(results);
+
         if (solution != null) {
             System.out.println("Heuristic result: " + aStarTree.calcHeuristicCost(aStarTree.getRoot()));
             System.out.println("Number of steps: " + formatter.format(solution.getDepth()));
         }
+
         final long end = System.currentTimeMillis();
         final long elapsedTime = end - start;
         formatter = new java.text.DecimalFormat("#,###.###");

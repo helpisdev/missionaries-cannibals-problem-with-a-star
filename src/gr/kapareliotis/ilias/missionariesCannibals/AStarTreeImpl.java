@@ -11,8 +11,8 @@ public class AStarTreeImpl extends Tree {
     private final int maxDepth;
     private final HashSet<NodeImpl> reached = new HashSet<>();
     private final ArrayList<int[]> pairs = new ArrayList<>();
-    public int validNodes = 0;
-    public int invalidNodes = 0;
+    private int validNodes = 0;
+    private int invalidCombinations = 0;
 
     public AStarTreeImpl(Node root, int numberOfPeople, int boatCapacity, int maxDepth) {
         super(root);
@@ -59,6 +59,22 @@ public class AStarTreeImpl extends Tree {
 
     public HashSet<NodeImpl> getReached() {
         return this.reached;
+    }
+
+    public int getValidNodes() {
+        return this.validNodes;
+    }
+
+    public void increaseValidNodes() {
+        ++this.validNodes;
+    }
+
+    public int getInvalidCombinations() {
+        return this.invalidCombinations;
+    }
+
+    public void increaseInvalidCombinations() {
+        ++this.invalidCombinations;
     }
 
     @Override
