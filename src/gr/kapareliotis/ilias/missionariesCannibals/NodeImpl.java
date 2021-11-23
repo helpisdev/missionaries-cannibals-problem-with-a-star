@@ -146,7 +146,8 @@ public class NodeImpl extends Node {
                 isBoatLeft ? "<" + this.mOnBoat + ", " + this.cOnBoat + ">______" :
                         "______<" + this.mOnBoat + ", " + this.cOnBoat + ">";
         return String.format(
-                "(%d, %d, %s, %d, %d, Side: %d)",
+                "%s. (%d, %d, %s, %d, %d, Side: %d)",
+                this.getDepth(),
                 this.missionaries,
                 this.cannibals,
                 boatRepresentation,

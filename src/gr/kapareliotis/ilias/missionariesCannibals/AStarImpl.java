@@ -8,7 +8,7 @@ public class AStarImpl {
     private void getInput() {
         java.util.Scanner scanner = new java.util.Scanner(System.in);
         boolean isInputCorrect;
-        int numberOfPeople;
+        int missionaries;
         int boatCapacity;
         int maximumDepth;
 
@@ -16,14 +16,14 @@ public class AStarImpl {
             try {
                 isInputCorrect = true;
 
-                System.out.print("Enter the number of people: ");
-                numberOfPeople = scanner.nextInt();
-                if (numberOfPeople <= 1 || numberOfPeople % 2 != 0) {
+                System.out.print("Enter the number of missionaries: ");
+                missionaries = scanner.nextInt();
+                if (missionaries < 0) {
                     isInputCorrect = false;
                     continue;
                 }
 
-                this.numberOfPeople = numberOfPeople;
+                this.numberOfPeople = missionaries * 2;
 
                 System.out.print("Enter the boat capacity: ");
                 boatCapacity = scanner.nextInt();
